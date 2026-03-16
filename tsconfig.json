@@ -1,0 +1,43 @@
+{
+    "compilerOptions": {
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "bundler",
+        "allowJs": true,
+        "strict": true,
+        "sourceMap": true,
+        "noImplicitAny": true,
+        "esModuleInterop": true,
+        "skipLibCheck": true,
+        "outDir": "dist",
+        "baseUrl": ".",
+        /* Vue & Vite Specifics */
+        "jsx": "preserve",
+        "lib": [
+            "ESNext",
+            "DOM",
+            "DOM.Iterable"
+        ],
+        "types": [
+            "vite/client"
+        ],
+        /* Path Aliases (Optional but Recommended) */
+        "paths": {
+            "@/*": [
+                "src/*"
+            ],
+            "@renderer/*": [
+                "src/renderer/*"
+            ]
+        }
+    },
+    "include": [
+        "src/**/*",
+        "src/**/*.vue",
+        "src/types/**/*.d.ts"
+    ],
+    "exclude": [
+        "node_modules",
+        "dist"
+    ]
+}
