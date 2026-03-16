@@ -28,6 +28,7 @@
     "@electron-forge/plugin-fuses": "^7.11.1",
     "@electron-forge/plugin-vite": "^7.11.1",
     "@electron/fuses": "^1.8.0",
+    "@openapitools/openapi-generator-cli": "^2.30.2",
     "electron": "41.0.2",
     "vite": "^5.4.21"
   },
