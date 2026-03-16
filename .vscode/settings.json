@@ -1,5 +1,6 @@
 {
     "conventionalCommits.scopes": [
-        "flysdk"
+        "flysdk",
+        "renderer"
     ]
 }
