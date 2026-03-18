@@ -6,6 +6,8 @@ import { Machine } from "../../flysdk/api";
 // 2. Tell TS about your custom Electron bridge
 interface IFlyApi {
     listMachines: () => Machine[];
+    startMachine: (id: string) => void;
+    stopMachine: (id: string) => void;
 }
 
 declare global {
