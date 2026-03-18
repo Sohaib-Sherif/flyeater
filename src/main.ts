@@ -1,7 +1,7 @@
 declare const MAIN_WINDOW_VITE_DEV_SERVER_URL: string;
 declare const MAIN_WINDOW_VITE_NAME: string;
 
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, nativeImage, Tray } from 'electron';
 import path from 'node:path';
 import started from 'electron-squirrel-startup';
 
@@ -10,11 +10,19 @@ if (started) {
   app.quit();
 }
 
+let mainWindow: BrowserWindow | null = null;
+let tray: Tray | null = null;
+
 const createWindow = () => {
   // Create the browser window.
-  const mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
+  mainWindow = new BrowserWindow({
+    width: 420,
+    height: 560,
+    show: false,
+    frame: false,
+    resizable: false,
+    fullscreenable: false,
+    transparent: true,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
     },
@@ -27,8 +35,48 @@ const createWindow = () => {
     mainWindow.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`));
   }
 
-  // Open the DevTools.
-  mainWindow.webContents.openDevTools();
+  mainWindow.on('blur', () => {
+    mainWindow?.hide();
+  })
+};
+
+const showWindow = () => {
+  if (!mainWindow) {
+    createWindow();
+  }
+
+  if (!mainWindow) return;
+
+  const trayBounds = tray?.getBounds();
+  if (trayBounds) {
+    const width = 420;
+    const height = 560;
+    const x = Math.round(trayBounds.x + (trayBounds.width / 2) - (width / 2));
+    const y = Math.round(trayBounds.y + trayBounds.height + 4)
+
+    mainWindow.setBounds({ x, y, width, height });
+  }
+
+  mainWindow.show();
+  mainWindow.focus();
+};
+
+const createTray = () => {
+  if (tray) return;
+
+  const icon = nativeImage.createFromPath('');
+  icon.setTemplateImage(true);
+  tray = new Tray(icon);
+  tray.setToolTip('FlyEater');
+
+  tray.on('click', () => {
+    if (mainWindow?.isVisible()) {
+      mainWindow.hide();
+    } else {
+      showWindow();
+    }
+  });
+
 };
 
 // This method will be called when Electron has finished
@@ -36,14 +84,12 @@ const createWindow = () => {
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
   createWindow();
+  createTray();
+  app.dock?.hide()
 
-  // On OS X it's common to re-create a window in the app when the
-  // dock icon is clicked and there are no other windows open.
   app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) {
-      createWindow();
-    }
-  });
+    showWindow();
+  })
 });
 
 // Quit when all windows are closed, except on macOS. There, it's common
