@@ -6,7 +6,7 @@ import { Item, ItemActions, ItemContent, ItemDescription, ItemTitle } from './ba
 import { PlayIcon, RefreshCwIcon, SquareIcon } from 'lucide-vue-next';
 import { Spinner } from './base/components/ui/spinner';
 import { Badge } from './base/components/ui/badge';
-import { formatDate, formatDistanceToNowStrict } from 'date-fns';
+import { compareDesc, formatDate, formatDistanceToNowStrict } from 'date-fns';
 
 interface ExtendedMachine extends Machine {
   isUpdatingState: boolean
@@ -27,6 +27,8 @@ async function listMachines() {
       ...machine,
       isUpdatingState: false
     }
+  }).sort((firstMachine, secondMachine) => {
+    return compareDesc(firstMachine.updated_at?? '', secondMachine.updated_at?? '')
   });
 }
 
