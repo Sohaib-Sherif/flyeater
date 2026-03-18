@@ -1,7 +1,7 @@
 declare const MAIN_WINDOW_VITE_DEV_SERVER_URL: string;
 declare const MAIN_WINDOW_VITE_NAME: string;
 
-import { app, BrowserWindow, ipcMain, nativeImage, Tray } from 'electron';
+import { app, BrowserWindow, ipcMain, IpcMainInvokeEvent, nativeImage, Tray } from 'electron';
 import path from 'node:path';
 import started from 'electron-squirrel-startup';
 import { MachinesApi } from './../flysdk/api';
@@ -19,8 +19,8 @@ let apiInstance: MachinesApi | null = null;
 const createWindow = () => {
   // Create the browser window.
   mainWindow = new BrowserWindow({
-    width: 420,
-    height: 560,
+    width: 560,
+    height: 320,
     show: false,
     frame: false,
     resizable: false,
@@ -52,8 +52,8 @@ const showWindow = () => {
 
   const trayBounds = tray?.getBounds();
   if (trayBounds) {
-    const width = 420;
-    const height = 560;
+    const width = 560;
+    const height = 320;
     const x = Math.round(trayBounds.x + (trayBounds.width / 2) - (width / 2));
     const y = Math.round(trayBounds.y + trayBounds.height + 4)
 
@@ -90,7 +90,7 @@ app.whenReady().then(() => {
   createTray();
   app.dock?.hide()
 
-  mainWindow?.webContents.openDevTools()
+  // mainWindow?.webContents.openDevTools()
 
   const configuration = new Configuration({ 
     baseOptions: {
@@ -102,6 +102,8 @@ app.whenReady().then(() => {
   apiInstance = new MachinesApi(configuration);
 
   ipcMain.handle('machines:list', listMachinesHandler);
+  ipcMain.handle('machines:start', startMachineHandler);
+  ipcMain.handle('machines:stop', stopMachineHandler)
 });
 
 // Quit when all windows are closed, except on macOS. There, it's common
@@ -117,8 +119,20 @@ app.on('window-all-closed', () => {
 // code. You can also put them in separate files and import them here.
 
 async function listMachinesHandler() {
-  const machines = await apiInstance?.machinesList('ente')
+  const response = await apiInstance?.machinesList('ente')
   
-  console.log(machines?.statusText, machines?.status)
-  return machines?.data
+  console.log(response?.statusText, response?.status)
+  return response?.data
+}
+
+async function startMachineHandler(event: IpcMainInvokeEvent, id: string) {
+  const response = await apiInstance?.machinesStart('ente', id)
+  
+  console.log(response?.status, 'machine started')
+}
+
+async function stopMachineHandler(event: IpcMainInvokeEvent, id: string) {
+  const response = await apiInstance?.machinesStop('ente', id)
+
+  console.log(response?.status, 'machine stopped')
 }
