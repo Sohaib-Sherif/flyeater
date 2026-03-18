@@ -2,6 +2,7 @@
     "conventionalCommits.scopes": [
         "flysdk",
         "renderer",
-        "main"
+        "main",
+        "preload"
     ]
 }
