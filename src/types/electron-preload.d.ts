@@ -10,4 +10,13 @@ declare global {
     interface Window {
         electronAPI: IElectronAPI;
     }
+
+    namespace NodeJS {
+        interface ProcessEnv {
+            MAIN_VITE_FLY_API_TOKEN: string;
+            MAIN_VITE_FLY_API_HOSTNAME: string;
+        }
+  }
 }
+
+export {}
