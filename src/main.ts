@@ -1,9 +1,11 @@
 declare const MAIN_WINDOW_VITE_DEV_SERVER_URL: string;
 declare const MAIN_WINDOW_VITE_NAME: string;
 
-import { app, BrowserWindow, nativeImage, Tray } from 'electron';
+import { app, BrowserWindow, ipcMain, nativeImage, Tray } from 'electron';
 import path from 'node:path';
 import started from 'electron-squirrel-startup';
+import { MachinesApi } from './../flysdk/api';
+import { Configuration } from '../flysdk/configuration';
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
@@ -12,6 +14,7 @@ if (started) {
 
 let mainWindow: BrowserWindow | null = null;
 let tray: Tray | null = null;
+let apiInstance: MachinesApi | null = null;
 
 const createWindow = () => {
   // Create the browser window.
@@ -87,9 +90,18 @@ app.whenReady().then(() => {
   createTray();
   app.dock?.hide()
 
-  app.on('activate', () => {
-    showWindow();
-  })
+  mainWindow?.webContents.openDevTools()
+
+  const configuration = new Configuration({ 
+    baseOptions: {
+      headers: {
+        Authorization: `Bearer ${process.env.MAIN_VITE_FLY_API_TOKEN}` 
+      }
+    },
+  });
+  apiInstance = new MachinesApi(configuration);
+
+  ipcMain.handle('machines:list', listMachinesHandler);
 });
 
 // Quit when all windows are closed, except on macOS. There, it's common
@@ -103,3 +115,10 @@ app.on('window-all-closed', () => {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and import them here.
+
+async function listMachinesHandler() {
+  const machines = await apiInstance?.machinesList('ente')
+  
+  console.log(machines?.statusText, machines?.status)
+  return machines?.data
+}
