@@ -121,4 +121,11 @@
     body {
         @apply bg-background text-foreground;
     }
+
+    /* Restore button cursor behavior after tailwind v4 changed to default*/
+    button:not(:disabled),
+    [role="button"]:not(:disabled) {
+        cursor: pointer;
+    }
+
 }
