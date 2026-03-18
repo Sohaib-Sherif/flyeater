@@ -1,14 +1,16 @@
 /// <reference types="@electron-forge/plugin-vite/forge-vite-env" />
 
+import { Machine } from "../../flysdk/api";
+
 
 // 2. Tell TS about your custom Electron bridge
-interface IElectronAPI {
-    sayHello: () => void;
+interface IFlyApi {
+    listMachines: () => Machine[];
 }
 
 declare global {
     interface Window {
-        electronAPI: IElectronAPI;
+        flyApi: IFlyApi;
     }
 
     namespace NodeJS {
