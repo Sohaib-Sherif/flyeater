@@ -5,6 +5,8 @@ import { Machine } from '../../flysdk/api';
 import { Item, ItemActions, ItemContent, ItemDescription, ItemTitle } from './base/components/ui/item';
 import { PlayIcon, RefreshCwIcon, SquareIcon } from 'lucide-vue-next';
 import { Spinner } from './base/components/ui/spinner';
+import { Badge } from './base/components/ui/badge';
+import { formatDate, formatDistanceToNowStrict } from 'date-fns';
 
 interface ExtendedMachine extends Machine {
   isUpdatingState: boolean
@@ -50,6 +52,33 @@ async function startOrStopMachine(machine: ExtendedMachine) {
   // refetch the machines to see new state
   await listMachines();
 }
+
+function formatAbsoluteDate(machine: ExtendedMachine) {
+  if(!machine.updated_at) {
+    return 'Undefined date';
+  }
+
+  return formatDate(new Date(machine.updated_at), 'yyyy-MM-dd HH:mm:ss')
+}
+
+function formatRelativeDate(machine: ExtendedMachine) {
+  if(!machine.updated_at || !machine.state) {
+    return;
+  }
+
+  const distance = formatDistanceToNowStrict(machine.updated_at, { addSuffix: true, roundingMethod: 'round'});
+
+  switch(machine.state) {
+    case 'started':
+      return `Running since ${distance}`;
+    case 'stopped':
+      return `Last ran ${distance}`;
+    case 'suspended':
+      return `Suspended ${distance}`;
+    default:
+      return 'Undefined state'
+  }
+}
 </script>
 
 <template>
@@ -74,7 +103,12 @@ async function startOrStopMachine(machine: ExtendedMachine) {
       <ItemContent>
         <ItemTitle>{{ machine.name }}</ItemTitle>
         <ItemDescription>
-          {{ machine.region }} - {{ machine.updated_at }}
+          <Badge :variant="'secondary'"">
+            {{ machine.region }}
+          </Badge>
+          <p :title="formatAbsoluteDate(machine)">
+            {{ formatRelativeDate(machine) }}
+          </p>
         </ItemDescription>
       </ItemContent>
       <ItemActions>
