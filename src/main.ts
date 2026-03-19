@@ -128,21 +128,21 @@ async function listOrgMachinesHandler() {
   console.log(response?.status, 'org machines fetched')
   return response?.data.machines;
 }
-async function listMachinesHandler() {
-  const response = await organizationsApiInstance?.machinesOrgList('personal')
+async function listMachinesHandler(event: IpcMainInvokeEvent, appName: string) {
+  const response = await machinesApiInstance?.machinesList(appName)
 
-  console.log(response?.status, 'machines fetched')
+  console.log(response?.status, `machines fetched for app: ${appName}`)
   return response?.data
 }
 
-async function startMachineHandler(event: IpcMainInvokeEvent, id: string) {
-  const response = await machinesApiInstance?.machinesStart('ente', id)
+async function startMachineHandler(event: IpcMainInvokeEvent, id: string, appName: string) {
+  const response = await machinesApiInstance?.machinesStart(appName, id)
   
-  console.log(response?.status, 'machine started')
+  console.log(response?.status, `[STARTED] machine for app (${appName}) with ID (${id}) has started`)
 }
 
-async function stopMachineHandler(event: IpcMainInvokeEvent, id: string) {
-  const response = await machinesApiInstance?.machinesStop('ente', id)
+async function stopMachineHandler(event: IpcMainInvokeEvent, id: string, appName: string) {
+  const response = await machinesApiInstance?.machinesStop(appName, id)
 
-  console.log(response?.status, 'machine stopped')
+  console.log(response?.status, `[STOPPED] machine for app (${appName}) with ID (${id}) has stopped`)
 }
