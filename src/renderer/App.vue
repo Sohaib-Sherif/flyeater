@@ -39,15 +39,15 @@ async function refreshList() {
 }
 
 async function startOrStopMachine(machine: ExtendedMachine) {
-  if(!machine || !machine.id)
+  if(!machine || !machine.id || !machine.app_name)
     return;
 
   machine.isUpdatingState = true
   if(machine.state !== 'started') {
-    await window.flyApi.startMachine(machine.id);
+    await window.flyApi.startMachine(machine.id, machine.app_name);
   }
   else {
-    await window.flyApi.stopMachine(machine.id);
+    await window.flyApi.stopMachine(machine.id, machine.app_name);
   }
   machine.isUpdatingState = false
 
