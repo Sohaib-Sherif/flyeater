@@ -6,7 +6,8 @@ import { Item, ItemActions, ItemContent, ItemDescription, ItemTitle } from './ba
 import { PlayIcon, RefreshCwIcon, SquareIcon } from 'lucide-vue-next';
 import { Spinner } from './base/components/ui/spinner';
 import { Badge } from './base/components/ui/badge';
-import { compareDesc, formatDate, formatDistanceToNowStrict } from 'date-fns';
+import { compareDesc, formatDate, formatDistanceToNow, formatDistanceToNowStrict, minutesToMilliseconds } from 'date-fns';
+import { now, useInterval, useTimeoutPoll } from '@vueuse/core';
 
 interface ExtendedMachine extends OrgMachine {
   isUpdatingState: boolean
@@ -15,10 +16,21 @@ interface ExtendedMachine extends OrgMachine {
 const machines = ref<ExtendedMachine[]>([])
 const listMachinesLoading = ref(false)
 const isRefreshingMachinesList = ref(false)
+const lastRefreshedAtTimestamp = ref<number | null>(null)
+const lastRefreshedAtRelativeDate = ref('')
 
 onMounted(() => {
   listMachines();
 })
+
+useTimeoutPoll(refreshList, minutesToMilliseconds(5))
+useInterval(1000, { callback() {
+  if(!lastRefreshedAtTimestamp.value) {
+    return;
+  }
+
+  lastRefreshedAtRelativeDate.value = formatDistanceToNow(lastRefreshedAtTimestamp.value, { addSuffix: true, includeSeconds: true })
+},})
 
 async function listMachines() {
   const apiResult = await window.flyApi.listOrgMachines();
@@ -36,6 +48,7 @@ async function refreshList() {
   isRefreshingMachinesList.value = true;
   await listMachines();
   isRefreshingMachinesList.value = false;
+  lastRefreshedAtTimestamp.value = now()
 }
 
 async function startOrStopMachine(machine: ExtendedMachine) {
@@ -88,7 +101,7 @@ function formatRelativeDate(machine: ExtendedMachine) {
     <Button 
       variant="outline" 
       size="default" 
-      class="mb-4" 
+      class="mb-1" 
       :disabled="isRefreshingMachinesList"
       @click="refreshList" 
     >
@@ -96,6 +109,12 @@ function formatRelativeDate(machine: ExtendedMachine) {
       <Spinner v-else class="animate-spin"></Spinner>
       Refresh
     </Button>
+    <p 
+      v-if="lastRefreshedAtTimestamp"
+      class="text-xs text-muted-foreground mb-4"
+    >
+      Last refreshed {{ lastRefreshedAtRelativeDate }}
+    </p>
     <Item
       v-for="(machine, index) in machines"
       :key="index"
