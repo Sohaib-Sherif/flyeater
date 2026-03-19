@@ -4,6 +4,7 @@
 import { contextBridge, ipcRenderer } from "electron";
 
 contextBridge.exposeInMainWorld('flyApi', {
+    listOrgMachines: () => ipcRenderer.invoke('organizations:listMachines'),
     listMachines: () => ipcRenderer.invoke('machines:list'),
     startMachine: (id: string) => ipcRenderer.invoke('machines:start', id),
     stopMachine: (id: string) => ipcRenderer.invoke('machines:stop', id)
