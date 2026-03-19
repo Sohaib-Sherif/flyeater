@@ -6,9 +6,9 @@ import { Machine, OrgMachine } from "../../flysdk/api";
 // 2. Tell TS about your custom Electron bridge
 interface IFlyApi {
     listOrgMachines: () => OrgMachine[];
-    listMachines: () => Machine[];
-    startMachine: (id: string) => void;
-    stopMachine: (id: string) => void;
+    listMachines: (appName: string) => Machine[];
+    startMachine: (id: string, appName: string) => void;
+    stopMachine: (id: string, appName: string) => void;
 }
 
 declare global {
