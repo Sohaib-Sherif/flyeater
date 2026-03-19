@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
 import { Button } from './base/components/ui/button';
-import { Machine } from '../../flysdk/api';
+import { OrgMachine } from '../../flysdk/api';
 import { Item, ItemActions, ItemContent, ItemDescription, ItemTitle } from './base/components/ui/item';
 import { PlayIcon, RefreshCwIcon, SquareIcon } from 'lucide-vue-next';
 import { Spinner } from './base/components/ui/spinner';
 import { Badge } from './base/components/ui/badge';
 import { compareDesc, formatDate, formatDistanceToNowStrict } from 'date-fns';
 
-interface ExtendedMachine extends Machine {
+interface ExtendedMachine extends OrgMachine {
   isUpdatingState: boolean
 }
 
@@ -21,7 +21,7 @@ onMounted(() => {
 })
 
 async function listMachines() {
-  const apiResult = await window.flyApi.listMachines();
+  const apiResult = await window.flyApi.listOrgMachines();
   machines.value = apiResult.map((machine) => {
     return {
       ...machine,
@@ -105,10 +105,11 @@ function formatRelativeDate(machine: ExtendedMachine) {
       <ItemContent>
         <ItemTitle>{{ machine.name }}</ItemTitle>
         <ItemDescription>
-          <Badge :variant="'secondary'"">
+          <Badge class="bg-orange-300 text-orange-900 me-1" title="App name">{{ machine.app_name }}</Badge>
+          <Badge class="bg-zinc-300 text-zinc-900" title="Region">
             {{ machine.region }}
           </Badge>
-          <p :title="formatAbsoluteDate(machine)">
+          <p class="mt-2" :title="formatAbsoluteDate(machine)">
             {{ formatRelativeDate(machine) }}
           </p>
         </ItemDescription>
