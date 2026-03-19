@@ -4,7 +4,7 @@ declare const MAIN_WINDOW_VITE_NAME: string;
 import { app, BrowserWindow, ipcMain, IpcMainInvokeEvent, nativeImage, Tray } from 'electron';
 import path from 'node:path';
 import started from 'electron-squirrel-startup';
-import { MachinesApi } from './../flysdk/api';
+import { MachinesApi, OrganizationsApi } from './../flysdk/api';
 import { Configuration } from '../flysdk/configuration';
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
@@ -14,7 +14,8 @@ if (started) {
 
 let mainWindow: BrowserWindow | null = null;
 let tray: Tray | null = null;
-let apiInstance: MachinesApi | null = null;
+let organizationsApiInstance: OrganizationsApi | null = null;
+let machinesApiInstance: MachinesApi | null = null;
 
 const createWindow = () => {
   // Create the browser window.
@@ -99,8 +100,11 @@ app.whenReady().then(() => {
       }
     },
   });
-  apiInstance = new MachinesApi(configuration);
 
+  organizationsApiInstance = new OrganizationsApi(configuration);
+  machinesApiInstance = new MachinesApi(configuration);
+
+  ipcMain.handle('organizations:listMachines', listOrgMachinesHandler)
   ipcMain.handle('machines:list', listMachinesHandler);
   ipcMain.handle('machines:start', startMachineHandler);
   ipcMain.handle('machines:stop', stopMachineHandler)
@@ -118,21 +122,27 @@ app.on('window-all-closed', () => {
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and import them here.
 
+async function listOrgMachinesHandler() {
+  const response = await organizationsApiInstance?.machinesOrgList('personal');
+
+  console.log(response?.status, 'org machines fetched')
+  return response?.data.machines;
+}
 async function listMachinesHandler() {
-  const response = await apiInstance?.machinesList('ente')
-  
-  console.log(response?.statusText, response?.status)
+  const response = await organizationsApiInstance?.machinesOrgList('personal')
+
+  console.log(response?.status, 'machines fetched')
   return response?.data
 }
 
 async function startMachineHandler(event: IpcMainInvokeEvent, id: string) {
-  const response = await apiInstance?.machinesStart('ente', id)
+  const response = await machinesApiInstance?.machinesStart('ente', id)
   
   console.log(response?.status, 'machine started')
 }
 
 async function stopMachineHandler(event: IpcMainInvokeEvent, id: string) {
-  const response = await apiInstance?.machinesStop('ente', id)
+  const response = await machinesApiInstance?.machinesStop('ente', id)
 
   console.log(response?.status, 'machine stopped')
 }
