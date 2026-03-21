@@ -13,5 +13,9 @@ export default defineConfig(({ mode }) => {
       'process.env.MAIN_VITE_FLY_API_HOSTNAME': JSON.stringify(env.MAIN_VITE_FLY_API_HOSTNAME),
     },
     // ... rest of your config
+    build: {
+      copyPublicDir: true
+    }, 
+    publicDir: './resources'
   };
 });
