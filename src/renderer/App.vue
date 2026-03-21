@@ -8,6 +8,7 @@ import { Spinner } from './base/components/ui/spinner';
 import { Badge } from './base/components/ui/badge';
 import { compareDesc, formatDate, formatDistanceToNow, formatDistanceToNowStrict, minutesToMilliseconds } from 'date-fns';
 import { now, useInterval, useTimeoutPoll } from '@vueuse/core';
+import flyLandscapeLogo from '../../resources/logo-landscape.svg';
 
 interface ExtendedMachine extends OrgMachine {
   isUpdatingState: boolean
@@ -98,23 +99,30 @@ function formatRelativeDate(machine: ExtendedMachine) {
 
 <template>
   <div class="p-4">
-    <Button 
-      variant="outline" 
-      size="default" 
-      class="mb-1" 
-      :disabled="isRefreshingMachinesList"
-      @click="refreshList" 
-    >
-      <RefreshCwIcon v-if="!isRefreshingMachinesList"></RefreshCwIcon>
-      <Spinner v-else class="animate-spin"></Spinner>
-      Refresh
-    </Button>
-    <p 
-      v-if="lastRefreshedAtTimestamp"
-      class="text-xs text-muted-foreground mb-4"
-    >
-      Last refreshed {{ lastRefreshedAtRelativeDate }}
-    </p>
+    <div class="flex justify-between mb-4">
+      <div>
+        <Button
+          variant="outline"
+          size="default"
+          class="mb-1"
+          :disabled="isRefreshingMachinesList"
+          @click="refreshList"
+        >
+          <RefreshCwIcon v-if="!isRefreshingMachinesList"></RefreshCwIcon>
+          <Spinner v-else class="animate-spin"></Spinner>
+          Refresh
+        </Button>
+        <p
+          v-show="lastRefreshedAtTimestamp"
+          class="text-xs text-muted-foreground"
+        >
+          Last refreshed {{ lastRefreshedAtRelativeDate }}
+        </p>
+      </div>
+      <a href="https://fly.io" target="_blank" title="Open Fly.io website">
+        <img :src="flyLandscapeLogo" class="w-20 h-10"/>
+      </a>
+    </div>
     <Item
       v-for="(machine, index) in machines"
       :key="index"
