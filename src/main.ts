@@ -1,7 +1,7 @@
 declare const MAIN_WINDOW_VITE_DEV_SERVER_URL: string;
 declare const MAIN_WINDOW_VITE_NAME: string;
 
-import { app, BrowserWindow, ipcMain, IpcMainInvokeEvent, Menu, nativeImage, Tray } from 'electron';
+import { app, BrowserWindow, ipcMain, IpcMainInvokeEvent, Menu, nativeImage, shell, Tray } from 'electron';
 import path from 'node:path';
 import started from 'electron-squirrel-startup';
 import { MachinesApi, OrganizationsApi } from './../flysdk/api';
@@ -44,6 +44,12 @@ const createWindow = () => {
   mainWindow.on('blur', () => {
     mainWindow?.hide();
   })
+
+    // Open external URLs in the user's default browser
+  mainWindow.webContents.setWindowOpenHandler((details) => {
+    shell.openExternal(details.url); // Open URL in user's browser
+    return { action: 'deny' }; // Prevent the app from opening the URL
+  });
 };
 
 const showWindow = () => {
