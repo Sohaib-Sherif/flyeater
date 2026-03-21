@@ -1,7 +1,7 @@
 declare const MAIN_WINDOW_VITE_DEV_SERVER_URL: string;
 declare const MAIN_WINDOW_VITE_NAME: string;
 
-import { app, BrowserWindow, ipcMain, IpcMainInvokeEvent, nativeImage, Tray } from 'electron';
+import { app, BrowserWindow, ipcMain, IpcMainInvokeEvent, Menu, nativeImage, Tray } from 'electron';
 import path from 'node:path';
 import started from 'electron-squirrel-startup';
 import { MachinesApi, OrganizationsApi } from './../flysdk/api';
@@ -11,6 +11,8 @@ import { Configuration } from '../flysdk/configuration';
 if (started) {
   app.quit();
 }
+
+Menu.setApplicationMenu(null);
 
 let mainWindow: BrowserWindow | null = null;
 let tray: Tray | null = null;
@@ -68,7 +70,8 @@ const showWindow = () => {
 const createTray = () => {
   if (tray) return;
 
-  const icon = nativeImage.createFromPath('');
+  const iconPath = path.join(__dirname, './icon@2x.png');
+  const icon = nativeImage.createFromPath(iconPath);
   icon.setTemplateImage(true);
   tray = new Tray(icon);
   tray.setToolTip('FlyEater');
