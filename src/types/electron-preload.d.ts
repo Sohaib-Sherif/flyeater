@@ -11,9 +11,13 @@ interface IFlyApi {
     stopMachine: (id: string, appName: string) => void;
 }
 
+interface ISystem {
+    shutdownApp: () => void;
+}
 declare global {
     interface Window {
         flyApi: IFlyApi;
+        system: ISystem;
     }
 
     namespace NodeJS {
