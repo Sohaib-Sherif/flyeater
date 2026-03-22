@@ -12,7 +12,7 @@ if (started) {
   app.quit();
 }
 
-Menu.setApplicationMenu(null);
+// Menu.setApplicationMenu(null);
 
 let mainWindow: BrowserWindow | null = null;
 let tray: Tray | null = null;
@@ -116,7 +116,9 @@ app.whenReady().then(() => {
   ipcMain.handle('organizations:listMachines', listOrgMachinesHandler)
   ipcMain.handle('machines:list', listMachinesHandler);
   ipcMain.handle('machines:start', startMachineHandler);
-  ipcMain.handle('machines:stop', stopMachineHandler)
+  ipcMain.handle('machines:stop', stopMachineHandler);
+
+  ipcMain.on('system:shutdown', () => app.quit());
 });
 
 // Quit when all windows are closed, except on macOS. There, it's common
