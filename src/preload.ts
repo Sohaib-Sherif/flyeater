@@ -7,5 +7,9 @@ contextBridge.exposeInMainWorld('flyApi', {
     listOrgMachines: () => ipcRenderer.invoke('organizations:listMachines'),
     listMachines: () => ipcRenderer.invoke('machines:list'),
     startMachine: (id: string, appName: string) => ipcRenderer.invoke('machines:start', id, appName),
-    stopMachine: (id: string, appName: string) => ipcRenderer.invoke('machines:stop', id, appName)
+    stopMachine: (id: string, appName: string) => ipcRenderer.invoke('machines:stop', id, appName),
+})
+
+contextBridge.exposeInMainWorld('system', {
+    shutdownApp: () => ipcRenderer.send('system:shutdown')
 })
