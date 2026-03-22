@@ -9,6 +9,7 @@ import { Badge } from './base/components/ui/badge';
 import { compareDesc, formatDate, formatDistanceToNow, formatDistanceToNowStrict, minutesToMilliseconds } from 'date-fns';
 import { now, useInterval, useTimeoutPoll } from '@vueuse/core';
 import flyLandscapeLogo from '../../resources/logo-landscape.svg';
+import { Skeleton } from './base/components/ui/skeleton';
 
 interface ExtendedMachine extends OrgMachine {
   isUpdatingState: boolean
@@ -34,6 +35,7 @@ useInterval(1000, { callback() {
 },})
 
 async function listMachines() {
+  listMachinesLoading.value = true;
   const apiResult = await window.flyApi.listOrgMachines();
   machines.value = apiResult.map((machine) => {
     return {
@@ -43,6 +45,7 @@ async function listMachines() {
   }).sort((firstMachine, secondMachine) => {
     return compareDesc(firstMachine.updated_at?? '', secondMachine.updated_at?? '')
   });
+  listMachinesLoading.value = false;
 }
 
 async function refreshList() {
@@ -134,7 +137,11 @@ function shutdown() {
         Last refreshed {{ lastRefreshedAtRelativeDate }}
       </p>
     </div>
+    <template v-if="listMachinesLoading">
+      <Skeleton v-for="skeleton in [1,2,3]" class="h-26 mb-4 w-full rounded-lg" />
+    </template>
     <Item
+      v-else
       v-for="(machine, index) in machines"
       :key="index"
       variant="muted"
