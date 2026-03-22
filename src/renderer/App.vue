@@ -3,7 +3,7 @@ import { onMounted, ref } from 'vue';
 import { Button } from './base/components/ui/button';
 import { OrgMachine } from '../../flysdk/api';
 import { Item, ItemActions, ItemContent, ItemDescription, ItemTitle } from './base/components/ui/item';
-import { PlayIcon, RefreshCwIcon, SquareIcon } from 'lucide-vue-next';
+import { PlayIcon, PowerIcon, RefreshCwIcon, SquareIcon } from 'lucide-vue-next';
 import { Spinner } from './base/components/ui/spinner';
 import { Badge } from './base/components/ui/badge';
 import { compareDesc, formatDate, formatDistanceToNow, formatDistanceToNowStrict, minutesToMilliseconds } from 'date-fns';
@@ -95,33 +95,44 @@ function formatRelativeDate(machine: ExtendedMachine) {
       return 'Undefined state'
   }
 }
+
+function shutdown() {
+  window.system.shutdownApp();
+}
 </script>
 
 <template>
   <div class="p-4">
-    <div class="flex justify-between mb-4">
-      <div>
-        <Button
-          variant="outline"
-          size="default"
-          class="mb-1"
-          :disabled="isRefreshingMachinesList"
-          @click="refreshList"
-        >
-          <RefreshCwIcon v-if="!isRefreshingMachinesList"></RefreshCwIcon>
-          <Spinner v-else class="animate-spin"></Spinner>
-          Refresh
-        </Button>
-        <p
-          v-show="lastRefreshedAtTimestamp"
-          class="text-xs text-muted-foreground"
-        >
-          Last refreshed {{ lastRefreshedAtRelativeDate }}
-        </p>
-      </div>
-      <a href="https://fly.io" target="_blank" title="Open Fly.io website">
+    <div class="float-right flex items-center">
+      <a href="https://fly.io" 
+        target="_blank" 
+        title="Open Fly.io website" 
+        class="me-4 focus:outline-0"
+      >
         <img :src="flyLandscapeLogo" class="w-20 h-10"/>
       </a>
+      <Button :variant="'outline'" :size="'icon-sm'" title="Exit" @click="shutdown">
+        <PowerIcon></PowerIcon>
+      </Button>
+    </div>
+    <div class="mb-4">
+      <Button
+        variant="outline"
+        size="default"
+        class="mb-1"
+        :disabled="isRefreshingMachinesList"
+        @click="refreshList"
+      >
+        <RefreshCwIcon v-if="!isRefreshingMachinesList"></RefreshCwIcon>
+        <Spinner v-else class="animate-spin"></Spinner>
+        Refresh
+      </Button>
+      <p
+        v-if="lastRefreshedAtTimestamp"
+        class="text-xs text-muted-foreground"
+      >
+        Last refreshed {{ lastRefreshedAtRelativeDate }}
+      </p>
     </div>
     <Item
       v-for="(machine, index) in machines"
