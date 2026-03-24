@@ -8,7 +8,7 @@ import { Spinner } from '@ui/base/components/ui/spinner';
 import { Badge } from '@ui/base/components/ui/badge';
 import { compareDesc, formatDate, formatDistanceToNow, formatDistanceToNowStrict, minutesToMilliseconds } from 'date-fns';
 import { now, useInterval, useTimeoutPoll } from '@vueuse/core';
-import flyLandscapeLogo from '../../resources/logo-landscape.svg';
+import flyLandscapeLogo from '@resources/logo-landscape.svg';
 import { Skeleton } from '@ui/base/components/ui/skeleton';
 
 interface ExtendedMachine extends OrgMachine {
