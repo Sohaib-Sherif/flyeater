@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">flyeater</string>
+    <string name="title_activity_main">flyeater</string>
+    <string name="package_name">patiently.sits.flyeater</string>
+    <string name="custom_url_scheme">patiently.sits.flyeater</string>
+</resources>
