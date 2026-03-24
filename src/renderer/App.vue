@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
 import { Button } from '@ui/base/components/ui/button';
-import { OrgMachine } from '../../flysdk/api';
+import { OrgMachine } from '@flysdk/api';
 import { Item, ItemActions, ItemContent, ItemDescription, ItemTitle } from '@ui/base/components/ui/item';
 import { PlayIcon, PowerIcon, RefreshCwIcon, SquareIcon } from 'lucide-vue-next';
 import { Spinner } from '@ui/base/components/ui/spinner';
