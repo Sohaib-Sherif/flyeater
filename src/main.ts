@@ -4,8 +4,8 @@ declare const MAIN_WINDOW_VITE_NAME: string;
 import { app, BrowserWindow, ipcMain, IpcMainInvokeEvent, Menu, nativeImage, shell, Tray } from 'electron';
 import path from 'node:path';
 import started from 'electron-squirrel-startup';
-import { MachinesApi, OrganizationsApi } from './../flysdk/api';
-import { Configuration } from '../flysdk/configuration';
+import { MachinesApi, OrganizationsApi } from '@flysdk/api';
+import { Configuration } from '@flysdk/configuration';
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
