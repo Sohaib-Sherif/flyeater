@@ -7,5 +7,10 @@ export default defineConfig({
   publicDir: './resources',
   build: {
     copyPublicDir: true
-  }, 
+  },
+  resolve: {
+    alias: {
+      '@flysdk': path.resolve(__dirname, './flysdk')
+    }
+  }
 });
