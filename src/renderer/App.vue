@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
-import { Button } from './base/components/ui/button';
+import { Button } from '@ui/base/components/ui/button';
 import { OrgMachine } from '../../flysdk/api';
-import { Item, ItemActions, ItemContent, ItemDescription, ItemTitle } from './base/components/ui/item';
+import { Item, ItemActions, ItemContent, ItemDescription, ItemTitle } from '@ui/base/components/ui/item';
 import { PlayIcon, PowerIcon, RefreshCwIcon, SquareIcon } from 'lucide-vue-next';
-import { Spinner } from './base/components/ui/spinner';
-import { Badge } from './base/components/ui/badge';
+import { Spinner } from '@ui/base/components/ui/spinner';
+import { Badge } from '@ui/base/components/ui/badge';
 import { compareDesc, formatDate, formatDistanceToNow, formatDistanceToNowStrict, minutesToMilliseconds } from 'date-fns';
 import { now, useInterval, useTimeoutPoll } from '@vueuse/core';
 import flyLandscapeLogo from '../../resources/logo-landscape.svg';
-import { Skeleton } from './base/components/ui/skeleton';
+import { Skeleton } from '@ui/base/components/ui/skeleton';
 
 interface ExtendedMachine extends OrgMachine {
   isUpdatingState: boolean
