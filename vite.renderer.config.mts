@@ -12,7 +12,8 @@ export default defineConfig({
     alias: {
       '@': path.resolve(__dirname, './src'),
       '@renderer': path.resolve(__dirname, './src/renderer'),
-      '@ui': path.resolve(__dirname, './ui')
+      '@ui': path.resolve(__dirname, './ui'),
+      '@flysdk': path.resolve(__dirname, './flysdk')
     }
   }
 });
