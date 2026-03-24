@@ -105,7 +105,7 @@ app.whenReady().then(() => {
   const configuration = new Configuration({ 
     baseOptions: {
       headers: {
-        Authorization: `Bearer ${process.env.MAIN_VITE_FLY_API_TOKEN}` 
+        Authorization: `Bearer ${import.meta.env.VITE_FLY_API_TOKEN}` 
       }
     },
   });
