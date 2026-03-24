@@ -19,13 +19,6 @@ declare global {
         flyApi: IFlyApi;
         system: ISystem;
     }
-
-    namespace NodeJS {
-        interface ProcessEnv {
-            MAIN_VITE_FLY_API_TOKEN: string;
-            MAIN_VITE_FLY_API_HOSTNAME: string;
-        }
-  }
 }
 
 export {}
