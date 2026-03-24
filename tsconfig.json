@@ -28,6 +28,9 @@
             ],
             "@renderer/*": [
                 "src/renderer/*"
+            ],
+            "@ui/*": [
+                "ui/*"
             ]
         }
     },
