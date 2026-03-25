@@ -5,6 +5,20 @@
     "types": [
       "vite/client"
     ],
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ],
+      "@ui/*": [
+        "../ui/*"
+      ],
+      "@flysdk/*": [
+        "../flysdk/*"
+      ],
+      "@resources/*": [
+        "../resources/*"
+      ]
+    },
     /* Linting */
     "strict": true,
     "noUnusedLocals": true,
