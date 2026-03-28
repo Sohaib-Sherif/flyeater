@@ -18,6 +18,12 @@
 	"upload_source_maps": true,
 	"compatibility_flags": [
 		"nodejs_compat"
+	],
+	"kv_namespaces": [
+		{
+			"binding": "FLY_MACHINE_STATE",
+			"id": "111ad203f2574fe19f9d42f5a1c3f02e"
+		}
 	]
 	/**
 	 * Smart Placement
