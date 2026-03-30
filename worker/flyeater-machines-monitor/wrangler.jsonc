@@ -24,7 +24,12 @@
 			"binding": "FLY_MACHINE_STATE",
 			"id": "111ad203f2574fe19f9d42f5a1c3f02e"
 		}
-	]
+	],
+	"secrets": {
+		"required": [
+			"NTFY_TOPIC"
+		]
+	}
 	/**
 	 * Smart Placement
 	 * https://developers.cloudflare.com/workers/configuration/smart-placement/#smart-placement
