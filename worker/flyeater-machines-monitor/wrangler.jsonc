@@ -27,7 +27,8 @@
 	],
 	"secrets": {
 		"required": [
-			"NTFY_TOPIC"
+			"NTFY_TOPIC",
+			"FLY_API_TOKEN"
 		]
 	}
 	/**
