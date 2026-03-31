@@ -15,26 +15,128 @@
  * Learn more at https://developers.cloudflare.com/workers/
  */
 
+import { env } from 'cloudflare:workers';
+import { OrganizationsApi, OrgMachine } from '@flysdk/api';
+import { Configuration } from '@flysdk/configuration';
+
+
 export default {
-	async fetch(req) {
-		const url = new URL(req.url);
-		url.pathname = '/__scheduled';
-		url.searchParams.append('cron', '* * * * *');
-		return new Response(`To test the scheduled handler, ensure you have used the "--test-scheduled" then try running "curl ${url.href}".`);
-	},
-
-	// The scheduled handler is invoked at the interval set in our wrangler.jsonc's
-	// [[triggers]] configuration.
-	async scheduled(event, env, ctx): Promise<void> {
-		// A Cron Trigger can make requests to other endpoints on the Internet,
-		// publish to a Queue, query a D1 Database, and much more.
-		//
-		// We'll keep it simple and make an API call to a Cloudflare API:
-		let resp = await fetch('https://api.cloudflare.com/client/v4/ips');
-		let wasSuccessful = resp.ok ? 'success' : 'fail';
-
-		// You could store this result in KV, write to a D1 Database, or publish to a Queue.
-		// In this template, we'll just log the result:
-		console.log(`trigger fired at ${event.cron}: ${wasSuccessful}`);
-	},
+  async scheduled(event): Promise<void> {
+    console.log(`Cron triggered at ${event.cron}`);
+    await checkMachineStates();
+  }
 } satisfies ExportedHandler<Env>;
+
+// Check periodically if any machines changed to "started" state
+async function checkMachineStates() {
+  // fetch machines and send notification if something is going wrong because I need to know
+  let machines: OrgMachine[];
+  try {
+    machines = await listMachines();
+  } catch (error) {
+    await sendNotificationViaNTFY("Error: Failed to fetch Fly.io machines. Check Worker logs.")
+    return;
+  }
+
+  // get the json from key-value store
+  const kvJSONResult = await env.FLY_MACHINE_STATE.get("states_of_machines");
+  // parse the json
+  let storedStatesOfMachines: OrgMachineState[] = kvJSONResult ? JSON.parse(kvJSONResult) : [];
+
+  // we have an empty store, let's populate it (happens first time only [I believe haha])
+  if (!storedStatesOfMachines.length) {
+    machines.forEach(machine => {
+      storedStatesOfMachines = [
+        ...storedStatesOfMachines,
+        {
+          id: machine.id,
+          app_name: machine.app_name,
+          state: machine.state,
+          updated_at: machine.updated_at,
+          last_notification_sent_at: undefined
+        }
+      ];
+    });
+  }
+
+  // map the json into a dictionary for easy use
+  const mappedStoredStatesOfMachines = new Map<string, OrgMachineState>(
+    storedStatesOfMachines.map((machine: OrgMachineState) => [machine.id ?? 'saywhat', machine])
+  );
+
+  for(const machine of machines) {
+    if (!machine || !machine.id) {
+      return;
+    }
+
+    const storedMachineState = mappedStoredStatesOfMachines.get(machine.id);
+
+    if (!storedMachineState) {
+      console.log("not found?!")
+      return;
+    }
+
+    if (machine.state === 'started' && storedMachineState.state !== 'started') {
+      await sendNotificationViaNTFY(
+        `Machine ${machine.app_name} (${machine.name}) has started`
+      );
+
+      mappedStoredStatesOfMachines.set(machine.id, {
+        id: machine.id,
+        app_name: machine.app_name,
+        state: 'started',
+        updated_at: machine.updated_at,
+        last_notification_sent_at: new Date().toISOString()
+      });
+    } else {
+      // update state in store to reflect upstream state yadda yadda
+      mappedStoredStatesOfMachines.set(machine.id, {
+        id: machine.id,
+        app_name: machine.app_name,
+        state: machine.state,
+        updated_at: machine.updated_at,
+        last_notification_sent_at: storedMachineState.last_notification_sent_at
+      })
+    }
+  };
+
+  await env.FLY_MACHINE_STATE.put('states_of_machines', JSON.stringify(Array.from(mappedStoredStatesOfMachines.values())));
+}
+
+interface OrgMachineState extends OrgMachine {
+  last_notification_sent_at?: string;
+}
+
+async function listMachines(): Promise<OrgMachine[]> {
+  const configuration = new Configuration({
+    baseOptions: {
+      headers: {
+        Authorization: `Bearer ${env.FLY_API_TOKEN}`
+      }
+    },
+  });
+  const organizationsApiInstance = new OrganizationsApi(configuration);
+
+  try {
+    const response = await organizationsApiInstance?.machinesOrgList('personal');
+    console.log(response?.status, 'org machines fetched');
+    return response?.data.machines ?? [];
+  } catch (error) {
+    console.log('Error fetching org machines', error)
+    throw error;
+  }
+}
+
+async function sendNotificationViaNTFY(message: string): Promise<void> {
+  try {
+    const response = await fetch(env.NTFY_TOPIC, {
+      method: 'POST',
+      body: message
+    });
+    if (!response.ok) {
+      console.error(`ntfy notification failed: ${response.status}`);
+    }
+  } catch (error) {
+    console.error('Error sending ntfy notification:', error);
+  }
+}
